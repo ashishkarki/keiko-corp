@@ -3,21 +3,18 @@ const MergeIntoSingleFilePlugin = require('webpack-merge-and-include-globally')
 const uglifyJS = require('uglify-js')
 const CleanCSS = require('clean-css')
 const path = require('path')
+const CopyPlugin = require('copy-webpack-plugin')
 
 module.exports = {
   entry: './src/js/main.js',
   module: {
     rules: [
       {
-        test: /\.(png|jp(e*)g|svg)$/,
+        test: /\.(png|jp(e*)g|svg|gif)$/i,
+        type: 'asset',
         use: [
           {
             loader: 'url-loader',
-            options: {
-              // limit: 8000,
-              name: 'images/[hash]-[name].[ext]',
-              publicPath: 'assets',
-            },
           },
         ],
       },
@@ -41,9 +38,9 @@ module.exports = {
       files: {
         'vendor.js': [
           // './src/js/main.js',
-          './src/js/lib/ajaxchimp.js',
-          './src/js/lib/bootstrap.min.js',
           './src/js/lib/jquery.js',
+          './src/js/lib/bootstrap.min.js',
+          './src/js/lib/ajaxchimp.js',
           './src/js/lib/nicescroll.js',
           './src/js/lib/owl.carousel.min.js',
           './src/js/lib/parallax.js',
@@ -64,6 +61,18 @@ module.exports = {
         'vendor.js': (code) => uglifyJS.minify(code).code,
         'style.css': (code) => new CleanCSS({}).minify(code).styles,
       },
+    }),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, 'src/img'),
+          to: path.resolve(__dirname, 'dist/img'),
+        },
+        {
+          from: path.resolve(__dirname, 'src/fonts'),
+          to: path.resolve(__dirname, 'dist/fonts'),
+        },
+      ],
     }),
   ],
   output: {
